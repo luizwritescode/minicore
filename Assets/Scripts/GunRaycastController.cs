@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.Events;
 using System.Collections;
 
 /*
@@ -7,7 +8,6 @@ using System.Collections;
     @TODO
     - Audio is missing
     - Make both guns shoot
-    - Add ammo controller
 
 */
 public class GunRaycastController : MonoBehaviour {
@@ -18,7 +18,7 @@ public class GunRaycastController : MonoBehaviour {
     public float hitForce = 100f;                                        // Amount of force which will be added to objects with a rigidbody shot by the player
     public Transform gunEndRight;                                            // Holds a reference to the gun end object, marking the muzzle location of the gun
     public Transform gunEndLeft;                                            // Holds a reference to the gun end object, marking the muzzle location of the gun
-    public WaitForSeconds shotDuration = new WaitForSeconds(0.1f);    // WaitForSeconds object used by our ShotEffect coroutine, determines time laser line will remain visible
+    public WaitForSeconds shotDuration = new WaitForSeconds(0.1f);          // WaitForSeconds object used by our ShotEffect coroutine, determines time laser line will remain visible
 
     private Camera fpsCam;                                                // Holds a reference to the first person camera
     private AudioSource gunAudio;                                        // Reference to the audio source which will play our shooting sound effect
@@ -29,11 +29,14 @@ public class GunRaycastController : MonoBehaviour {
     public ParticleSystem muzzleFlashRight;
     public ParticleSystem muzzleFlashLeft;
 
-    public float maxAmmo;
-    public float ammo;
+    public int maxAmmo;
+    public int ammo;
 
+    public UnityEvent isReloadingEvent;
+    public bool isReloading;
     public float reloadTime;
 
+    public Animator animator;
 
     void Start () 
     {
@@ -47,14 +50,25 @@ public class GunRaycastController : MonoBehaviour {
    
         // Get and store a reference to our Camera by searching this GameObject and its parents
         fpsCam = GetComponentInParent<Camera>();
+
+        // starts listening for the Reload function in UnityEvent
+        isReloading = false;
+
     }
 
 
     void Update () 
     {
-        // Check if the player has pressed the fire button and if enough time has elapsed since they last fired
-        if (Input.GetButtonDown("Fire1") && Time.time > nextFire) 
+        if( ammo <= 0 || Input.GetKey("r"))
         {
+            StartCoroutine(nameof(Reload));
+        }
+        // Check if the player has pressed the fire button and if enough time has elapsed since they last fired  and check if they have enough ammo
+        else if (Input.GetButton("Fire1") && Time.time > nextFire && ammo > 0) 
+        {
+            // subtract current ammo
+            ammo--;
+        
             // Update the time when our player can fire next
             nextFire = Time.time + fireRate;
 
@@ -104,6 +118,21 @@ public class GunRaycastController : MonoBehaviour {
         }
     }
 
+    public IEnumerator Reload()
+    {
+        Debug.Log("Reloading...");
+        
+        isReloading = true;
+
+
+        yield return new WaitForSeconds(reloadTime);
+
+        ammo = maxAmmo;
+
+        isReloading = false;
+
+       yield break;
+    }
 
     private IEnumerator ShotEffect()
     {
