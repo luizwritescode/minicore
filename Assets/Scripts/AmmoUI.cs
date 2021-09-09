@@ -1,6 +1,8 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+
 
 public class AmmoUI : MonoBehaviour
 {
@@ -10,10 +12,12 @@ public class AmmoUI : MonoBehaviour
     public int _maxAmmo;
     public int _ammo; 
 
+    
     bool _isReloading;
     int _currentAmmoShownInUI;
 
-    public Transform ammoBar;
+    public Slider ammoBarSlider;
+    public GameObject ammoBar;
     private Vector3 ammoBarSize = new Vector3(5, 2, 1);
     private Vector3 ammoBarPosition = new Vector3(1624,50,0);
 
@@ -25,23 +29,32 @@ public class AmmoUI : MonoBehaviour
         Gun = GameObject.Find("Gun");
         grc = Gun.GetComponent<GunRaycastController>();
 
+        ammoBarSlider = ammoBar.GetComponent<Slider>();
+
+        Debug.Log(ammoBarSlider);
+
         _isReloading = grc.isReloading;
         _maxAmmo = grc.maxAmmo;
-        _ammo = grc.ammo;
-        _currentAmmoShownInUI = _ammo;
+        _currentAmmoShownInUI = grc.maxAmmo;
+        
     }
+
+    //HIT POINTS/ HIT POINTS
+
+    //SLIDER.Value = hit points / max hit points 
+    //
 
     void Update()
     {
+        //refresh reference is this needed?
         grc = Gun.GetComponent<GunRaycastController>();
-        _ammo = grc.ammo;
 
-        if( _ammo < _currentAmmoShownInUI && _currentAmmoShownInUI > 0)
-        {
+        if(_currentAmmoShownInUI != grc.ammo)
+        {   
             // subtract size of the ammoBar
-            ammoBar.localScale += new Vector3(-0.05f ,  0f, 0f );
-            ammoBar.position += new Vector3(-2.5f, 0f, 0f);
-            _currentAmmoShownInUI--;
+            _currentAmmoShownInUI = grc.ammo;
+           ammoBarSlider.value = ((float)_currentAmmoShownInUI / (float)_maxAmmo);
+            Debug.Log(ammoBarSlider.value);
 
         }
         
