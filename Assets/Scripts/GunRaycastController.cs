@@ -6,11 +6,14 @@ using System.Collections;
 
     Ripped off learn.unity.com Shooting with Raycasts tutorial
     @TODO
-    - Audio is missing
-    - Make both guns shoot
+    - [ ] Audio is missing      
+    - [x] Make both guns shoot  
 
 */
-public class GunRaycastController : MonoBehaviour {
+
+[RequireComponent(typeof(ShootableEntity))]
+public class GunRaycastController : MonoBehaviour 
+{
 
     public int gunDamage = 1;                                            // Set the number of hitpoints that this gun will take away from shot objects with a health script
     public float fireRate = 0.25f;                                        // Number in seconds which controls how often the player can fire
@@ -20,7 +23,7 @@ public class GunRaycastController : MonoBehaviour {
     public Transform gunEndLeft;                                            // Holds a reference to the gun end object, marking the muzzle location of the gun
     public WaitForSeconds shotDuration = new WaitForSeconds(0.1f);          // WaitForSeconds object used by our ShotEffect coroutine, determines time laser line will remain visible
 
-    private Camera fpsCam;                                                // Holds a reference to the first person camera
+    public Camera fpsCam;                                                // Holds a reference to the first person camera
     private AudioSource gunAudio;                                        // Reference to the audio source which will play our shooting sound effect
     public LineRenderer laserLineRight;                                        // Reference to the LineRenderer component which will display our laserline
     public LineRenderer laserLineLeft;                                        // Reference to the LineRenderer component which will display our laserline
@@ -29,10 +32,12 @@ public class GunRaycastController : MonoBehaviour {
     public ParticleSystem muzzleFlashRight;
     public ParticleSystem muzzleFlashLeft;
 
+    public GameObject[] ArrivalDusts = new GameObject[5];
+
     public int maxAmmo;
     public int ammo;
 
-    public UnityEvent isReloadingEvent;
+
     public bool isReloading;
     public float reloadTime;
 
@@ -47,7 +52,7 @@ public class GunRaycastController : MonoBehaviour {
         //store particle system reference
         muzzleFlashRight = muzzleFlashRight.GetComponent<ParticleSystem>();
         muzzleFlashLeft = muzzleFlashLeft.GetComponent<ParticleSystem>();
-   
+    
         // Get and store a reference to our Camera by searching this GameObject and its parents
         fpsCam = GetComponentInParent<Camera>();
 
@@ -73,10 +78,10 @@ public class GunRaycastController : MonoBehaviour {
             nextFire = Time.time + fireRate;
 
             // Start our ShotEffect coroutine to turn our laser line on and off
-            StartCoroutine (ShotEffect());
+            StartCoroutine (nameof(ShotEffect));
     
             // Create a vector at the center of our camera's viewport
-             Vector3 rayOrigin = fpsCam.ViewportToWorldPoint (new Vector3(0.5f, 0.5f, 0.0f));
+            Vector3 rayOrigin = fpsCam.ViewportToWorldPoint (new Vector3(0.5f, 0.5f, 0.0f));
             //Vector3 rayOrigin = gunEnd.position;
 
             // Declare a raycast hit to store information about what our raycast has hit
@@ -94,7 +99,7 @@ public class GunRaycastController : MonoBehaviour {
                 laserLineLeft.SetPosition (1, hit.point);
 
                 // Get a reference to a health script attached to the collider we hit
-                ShootableObject health = hit.collider.GetComponent<ShootableObject>(); 
+                ShootableEntity health = hit.collider.GetComponent<ShootableEntity>(); 
 
                 // If there was a health script attached
                 if (health != null)
@@ -105,8 +110,11 @@ public class GunRaycastController : MonoBehaviour {
                 // Check if the object we hit has a rigidbody attached
                 if (hit.rigidbody != null)
                 {
+                    
                     // Add force to the rigidbody we hit, in the direction from which it was hit
                     hit.rigidbody.AddForce (-hit.normal * hitForce);
+
+                    StartCoroutine(nameof(ArrivalEffect), "SoftBody");
                 }
             }
             else
@@ -156,4 +164,15 @@ public class GunRaycastController : MonoBehaviour {
         muzzleFlashRight.Stop();
         muzzleFlashLeft.Stop();
     }
+
+    public IEnumerator ArrivalEffect()
+    {
+        //arrivalDustConcrete.Play();
+
+        yield return new WaitForSeconds(2.5f);
+
+        //arrivalDustConcrete.Stop();
+    }
+
+   
 }

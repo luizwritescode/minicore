@@ -31,8 +31,6 @@ public class AmmoUI : MonoBehaviour
 
         ammoBarSlider = ammoBar.GetComponent<Slider>();
 
-        Debug.Log(ammoBarSlider);
-
         _isReloading = grc.isReloading;
         _maxAmmo = grc.maxAmmo;
         _currentAmmoShownInUI = grc.maxAmmo;
@@ -54,7 +52,7 @@ public class AmmoUI : MonoBehaviour
             // subtract size of the ammoBar
             _currentAmmoShownInUI = grc.ammo;
            ammoBarSlider.value = ((float)_currentAmmoShownInUI / (float)_maxAmmo);
-            Debug.Log(ammoBarSlider.value);
+           // Debug.Log(ammoBarSlider.value);
 
         }
         
