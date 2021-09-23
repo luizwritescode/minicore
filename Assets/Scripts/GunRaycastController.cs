@@ -32,7 +32,6 @@ public class GunRaycastController : MonoBehaviour
     public ParticleSystem muzzleFlashRight;
     public ParticleSystem muzzleFlashLeft;
 
-    public GameObject[] ArrivalDusts = new GameObject[5];
 
     public int maxAmmo;
     public int ammo;
@@ -43,6 +42,8 @@ public class GunRaycastController : MonoBehaviour
 
     public Animator animator;
 
+    public GameObject ArrivalDust;
+
     void Start () 
     {
 
@@ -52,6 +53,8 @@ public class GunRaycastController : MonoBehaviour
         //store particle system reference
         muzzleFlashRight = muzzleFlashRight.GetComponent<ParticleSystem>();
         muzzleFlashLeft = muzzleFlashLeft.GetComponent<ParticleSystem>();
+
+        //arrivalDust = GetComponent<ParticleSystem>();
     
         // Get and store a reference to our Camera by searching this GameObject and its parents
         fpsCam = GetComponentInParent<Camera>();
@@ -114,7 +117,10 @@ public class GunRaycastController : MonoBehaviour
                     // Add force to the rigidbody we hit, in the direction from which it was hit
                     hit.rigidbody.AddForce (-hit.normal * hitForce);
 
-                    StartCoroutine(nameof(ArrivalEffect), "SoftBody");
+                    //Access and determine correct arrival dust to play 
+
+                    StartCoroutine(nameof(ArrivalEffect), hit.rigidbody );
+                    
                 }
             }
             else
@@ -142,7 +148,7 @@ public class GunRaycastController : MonoBehaviour
        yield break;
     }
 
-    private IEnumerator ShotEffect()
+    public IEnumerator ShotEffect()
     {
         // Play the shooting sound effect
         //gunAudio.Play ();
@@ -165,14 +171,20 @@ public class GunRaycastController : MonoBehaviour
         muzzleFlashLeft.Stop();
     }
 
-    public IEnumerator ArrivalEffect()
+    public IEnumerator ArrivalEffect(Rigidbody rb)
     {
-        //arrivalDustConcrete.Play();
 
+        ParticleSystem ps = ArrivalDust.GetComponent<ParticleSystem>();
+        
+        Instantiate(ps, rb.transform.position, rb.transform.rotation);
+
+        ps.Play();
+
+        Debug.Log(ps.main);
         yield return new WaitForSeconds(2.5f);
-
-        //arrivalDustConcrete.Stop();
+        ps.Stop();
     }
+
 
    
 }

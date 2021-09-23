@@ -35,6 +35,10 @@ public class EnemyAI : MonoBehaviour
     public bool playerInSightRange, playerInAttackRange;
     public string currentState = "off";
 
+
+    //VFX
+    ParticleSystem arrivalDust;
+
     private void Awake()
     {
         shootableEnt = GetComponent<ShootableEntity>();
@@ -52,6 +56,8 @@ public class EnemyAI : MonoBehaviour
             Debug.LogError("nav mesh agent component is not attached to " + gameObject.name);
         }
         
+
+        arrivalDust = GetComponent<ParticleSystem>();
     }
 
     // Update is called once per frame
