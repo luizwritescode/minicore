@@ -4,25 +4,31 @@ using UnityEngine;
 
 public class AutoDestroyParticleSystem: MonoBehaviour {
 
-    public List<GameObject> objs;
+    // public List<GameObject> objs;
 
-    private List<ParticleSystem> ps;
+    // private List<ParticleSystem> ps;
 
-    void Start() {}
+    // void Start() {}
 
-    private void Awake() {
-        foreach(GameObject o in objs)
-            ps.Add(o.GetComponent < ParticleSystem > ());
-    }
+    // private void Awake() {
+    //     ps = new List<ParticleSystem>();
+    //     foreach(GameObject o in objs)
+    //         ps.Add(o.GetComponent < ParticleSystem > ());
+    // }
 
-    private void Update() {
+    // private void Update() {
 
-        if (ps.Count > 0) {
-            foreach (ParticleSystem o in ps) {
-                if ( !o.IsAlive()) {
-                    Destroy(o.gameObject);
-                }
-            }
-        }
-    }
+    //     if (ps.Count > 0) {
+    //         foreach (ParticleSystem p in ps) {
+                
+    //             if(!p) continue;
+                
+    //             else if ( !p.IsAlive())
+    //             {
+    //                // Destroy(p.gameObject);
+    //                 ps.Remove(p);
+    //             }
+    //         }
+    //     }
+    
 }

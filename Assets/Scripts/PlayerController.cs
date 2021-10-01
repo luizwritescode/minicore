@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(PlayerMotor))]
+[RequireComponent(typeof(HumanMechaController))]
 public class PlayerController : MonoBehaviour
 {
     [SerializeField]
@@ -11,10 +11,7 @@ public class PlayerController : MonoBehaviour
     public float jumpHeight = 1f;
     public float jetpackDuration = 1f;
 
-    //Enables and disables jetpack and weapon abilities
-    public bool inMechForm = true;
-
-    Vector3 velocity;
+    public Vector3 velocity;
     bool isGrounded;
     float jumpTimer;
 
@@ -22,37 +19,33 @@ public class PlayerController : MonoBehaviour
     public float groundDistance = 0.2f;
     public LayerMask groundMask;
 
-    private PlayerMotor motor;
+    private HumanMechaController HMC;  
+    private bool inMechForm;
 
     public CharacterController controller;
 
-    void Start()
+    private void Awake()
     {
-        motor = GetComponent<PlayerMotor>();
+        if(HMC.currentState == "mecha")
+            inMechForm = true;
+        else 
+            inMechForm = false;
     }
 
-    // Update is called once per frame
     void Update()
     {
+       
+
         //Apply gravity
         velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
-
-        //Movement modifier checks
-        
 
         //Calculate movement velocity as 3D vector from Input and move player
-        float _xv = Input.GetAxisRaw("Horizontal");
-        float _zv = Input.GetAxisRaw("Vertical");
+        float _xv = Input.GetAxisRaw("Horizontal") * GetSpeed(speed);
+        float _zv = Input.GetAxisRaw("Vertical") * GetSpeed(speed);
 
-        Vector3 _move = transform.right * _xv + transform.forward * _zv;
+        velocity += transform.right * _xv + transform.forward * _zv;
 
-        controller.Move(_move * getSpeed(speed) * Time.deltaTime);
-
-        //Ground and Jump check
-        isGrounded = Physics.CheckSphere(groundCheck.position, groundDistance, groundMask);
-
-        if (isGrounded && velocity.y < 0)
+        if (controller.isGrounded && velocity.y < 0)
         {
             velocity.y = -2f;
         }
@@ -69,22 +62,15 @@ public class PlayerController : MonoBehaviour
         }
 
         //Mech controls
-
-        if (Input.GetKeyDown("e") && !inMechForm)
-        {
-            enterMech();
-        } 
-        else if (Input.GetKeyDown("e") && inMechForm)
-        {
-           exitMech(); 
-        }
- 
+        controller.Move(velocity * Time.deltaTime);
     }
 
-    public bool enterMech() { return inMechForm = true;}
-    public bool exitMech() { return inMechForm = false;}
+    //alter attributes based on current form
 
-    public float getSpeed(float s)
+    public bool EnterMecha() { jumpHeight = 5f; speed = speed * 0.8f; jetpackDuration = 1f; return inMechForm = true;}
+    public bool ExitMecha() { jumpHeight = 1f; speed = 5.5f; jetpackDuration = 0f; return inMechForm = false;}
+
+    public float GetSpeed(float s)
     {   
         float ret = s;
         if (Input.GetButton("Sprint"))

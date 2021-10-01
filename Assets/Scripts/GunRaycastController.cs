@@ -21,7 +21,7 @@ public class GunRaycastController : MonoBehaviour
     public float hitForce = 100f;                                        // Amount of force which will be added to objects with a rigidbody shot by the player
     public Transform gunEndRight;                                            // Holds a reference to the gun end object, marking the muzzle location of the gun
     public Transform gunEndLeft;                                            // Holds a reference to the gun end object, marking the muzzle location of the gun
-    public WaitForSeconds shotDuration = new WaitForSeconds(0.1f);          // WaitForSeconds object used by our ShotEffect coroutine, determines time laser line will remain visible
+    public WaitForSeconds shotDuration = new WaitForSeconds(0.7f);          // WaitForSeconds object used by our ShotEffect coroutine, determines time laser line will remain visible
 
     public Camera fpsCam;                                                // Holds a reference to the first person camera
     private AudioSource gunAudio;                                        // Reference to the audio source which will play our shooting sound effect
@@ -134,7 +134,7 @@ public class GunRaycastController : MonoBehaviour
 
     public IEnumerator Reload()
     {
-        Debug.Log("Reloading...");
+        //Debug.Log("Reloading...");
         
         isReloading = true;
 
@@ -150,10 +150,13 @@ public class GunRaycastController : MonoBehaviour
 
     public IEnumerator ShotEffect()
     {
+        ParticleSystem mfl = Instantiate(muzzleFlashLeft, gunEndRight );
+        ParticleSystem mfr = Instantiate(muzzleFlashLeft, gunEndLeft );
+
         // Play the shooting sound effect
         //gunAudio.Play ();
-        muzzleFlashRight.Play();
-        muzzleFlashLeft.Play();
+        mfr.Play();
+        mfl.Play();
 
         // Turn on our line renderer
         laserLineRight.enabled = true;
@@ -167,22 +170,24 @@ public class GunRaycastController : MonoBehaviour
         laserLineLeft.enabled = false;
 
 
-        muzzleFlashRight.Stop();
-        muzzleFlashLeft.Stop();
+        mfr.Stop();
+        mfl.Stop();
     }
 
-    public IEnumerator ArrivalEffect(Rigidbody rb)
+    public IEnumerator ArrivalEffect( Rigidbody rb)
     {
 
-        ParticleSystem ps = ArrivalDust.GetComponent<ParticleSystem>();
+        if(ArrivalDust != null)
+        {
+            ParticleSystem ps = ArrivalDust.GetComponent<ParticleSystem>();
         
-        Instantiate(ps, rb.transform.position, rb.transform.rotation);
+            Instantiate(ps, rb.transform.position, rb.transform.rotation);
 
-        ps.Play();
+            ps.Play();
 
-        Debug.Log(ps.main);
-        yield return new WaitForSeconds(2.5f);
-        ps.Stop();
+            yield return new WaitForSeconds(2.5f);
+            ps.Stop();
+        }
     }
 
 
